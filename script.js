@@ -20,6 +20,7 @@ const trainBtn = document.getElementById('trainBtn');
 const newMapBtn = document.getElementById('newMapBtn');
 const saveMapBtn = document.getElementById('saveMapBtn');
 const loadMapBtn = document.getElementById('loadMapBtn');
+const legendToggleBtn = document.getElementById('legendToggleBtn');
 const lineLegend = document.getElementById('lineLegend');
 const STORAGE_PREFIX = 'makeMetroSavedMapSlot';
 
@@ -36,7 +37,8 @@ const state = {
     trainProgress: 0,
     trainFrameId: null,
     trainPauseUntil: null,
-    trainLastStationId: null
+    trainLastStationId: null,
+    dpr: 1
 };
 
 function updateLegend() {
@@ -72,8 +74,11 @@ function setMode(nextMode) {
 
 function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    state.dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * state.dpr;
+    canvas.height = rect.height * state.dpr;
+    ctx.resetTransform();
+    ctx.scale(state.dpr, state.dpr);
     render();
 }
 
@@ -185,6 +190,14 @@ function drawPath(points, color, width = 5, dashed = false) {
     ctx.stroke();
 }
 
+function setTrainBtnState(running) {
+    const textSpan = trainBtn.querySelector('.btn-text');
+    const iconSpan = trainBtn.querySelector('.btn-icon');
+    if (textSpan) textSpan.textContent = running ? '운행 중지' : '시범 운행';
+    if (iconSpan) iconSpan.textContent = running ? '⏹️' : '🚆';
+    trainBtn.classList.toggle('active', running);
+}
+
 function createBlankMap() {
     state.lines = [];
     state.stations = [];
@@ -199,8 +212,7 @@ function createBlankMap() {
         cancelAnimationFrame(state.trainFrameId);
         state.trainFrameId = null;
     }
-    trainBtn.textContent = '시범 운행';
-    trainBtn.classList.remove('active');
+    setTrainBtnState(false);
     render();
 }
 
@@ -245,8 +257,7 @@ function loadMap() {
             cancelAnimationFrame(state.trainFrameId);
             state.trainFrameId = null;
         }
-        trainBtn.textContent = '시범 운행';
-        trainBtn.classList.remove('active');
+        setTrainBtnState(false);
         setActiveColor(state.activeColor);
         updateLegend();
         render();
@@ -297,8 +308,16 @@ function render() {
     }
 }
 
-function finalizeDraft() {
+function finalizeDraft(event) {
+    if (event && event.pointerId && canvas.hasPointerCapture && canvas.hasPointerCapture(event.pointerId)) {
+        try {
+            canvas.releasePointerCapture(event.pointerId);
+        } catch (e) {}
+    }
+
     if (!state.currentDraft || state.currentDraft.points.length < 2) {
+        state.currentDraft = null;
+        render();
         return;
     }
 
@@ -430,6 +449,16 @@ function deleteSelected() {
 }
 
 function handlePointerDown(event) {
+    if (event.cancelable) {
+        event.preventDefault();
+    }
+
+    if (canvas.setPointerCapture) {
+        try {
+            canvas.setPointerCapture(event.pointerId);
+        } catch (e) {}
+    }
+
     const point = getPointerPosition(event);
 
     if (state.mode === 'freehand' || state.mode === 'straight') {
@@ -478,6 +507,10 @@ function handlePointerDown(event) {
 }
 
 function handlePointerMove(event) {
+    if (event.cancelable) {
+        event.preventDefault();
+    }
+
     if (!state.currentDraft || (state.mode !== 'freehand' && state.mode !== 'straight')) {
         return;
     }
@@ -612,8 +645,7 @@ function toggleTrainSimulation() {
     state.trainRunning = !state.trainRunning;
     state.trainPauseUntil = null;
     state.trainLastStationId = null;
-    trainBtn.textContent = state.trainRunning ? '시범 운행 중지' : '시범 운행';
-    trainBtn.classList.toggle('active', state.trainRunning);
+    setTrainBtnState(state.trainRunning);
 
     if (state.trainRunning) {
         animateTrain();
@@ -629,7 +661,7 @@ colorOptions.forEach((color) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'color-btn';
-    button.title = color.label;
+    button.title = `${color.label} (${color.defaultLine})`;
     button.style.background = color.hex;
     button.dataset.color = color.hex;
     button.addEventListener('click', () => {
@@ -655,11 +687,19 @@ stationNameInput.addEventListener('blur', () => {
         renameSelectedStation();
     }
 });
+
 canvas.addEventListener('pointerdown', handlePointerDown);
 canvas.addEventListener('pointermove', handlePointerMove);
 canvas.addEventListener('pointerup', finalizeDraft);
 canvas.addEventListener('pointerleave', finalizeDraft);
 canvas.addEventListener('pointercancel', finalizeDraft);
+
+// 모바일 제스처 및 스크롤 완전 방지
+['touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach((evtName) => {
+    canvas.addEventListener(evtName, (e) => {
+        e.preventDefault();
+    }, { passive: false });
+});
 
 document.querySelectorAll('.mode-btn').forEach((button) => {
     button.addEventListener('click', () => {
@@ -676,6 +716,13 @@ newMapBtn.addEventListener('click', () => {
 });
 saveMapBtn.addEventListener('click', saveMap);
 loadMapBtn.addEventListener('click', loadMap);
+
+if (legendToggleBtn) {
+    legendToggleBtn.addEventListener('click', () => {
+        lineLegend.classList.toggle('mobile-hidden');
+    });
+}
+
 saveSlotSelect.addEventListener('change', () => {
     const slotValue = saveSlotSelect.value;
     const stored = localStorage.getItem(getSaveSlotKey(slotValue));

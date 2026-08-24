@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MakeMetro</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,18 +11,18 @@
         <div class="palette" id="colorPalette" aria-label="색상 선택"></div>
 
         <div class="field">
-            <label for="lineNameInput">호선 이름</label>
-            <input id="lineNameInput" type="text" value="1호선" maxlength="12">
+            <label for="lineNameInput">호선</label>
+            <input id="lineNameInput" type="text" value="1호선" maxlength="12" placeholder="호선명" title="호선 이름">
         </div>
 
         <div class="field">
-            <label for="stationNameInput">역 이름</label>
-            <input id="stationNameInput" type="text" value="역" maxlength="12">
+            <label for="stationNameInput">역</label>
+            <input id="stationNameInput" type="text" value="역" maxlength="12" placeholder="역이름" title="역 이름">
         </div>
 
         <div class="field">
-            <label for="saveSlotSelect">저장 공간</label>
-            <select id="saveSlotSelect">
+            <label for="saveSlotSelect">슬롯</label>
+            <select id="saveSlotSelect" title="저장 슬롯">
                 <option value="1">1번</option>
                 <option value="2">2번</option>
                 <option value="3">3번</option>
@@ -32,20 +32,21 @@
         </div>
 
         <div class="mode-group">
-            <button class="mode-btn active" data-mode="freehand" type="button">자유선</button>
-            <button class="mode-btn" data-mode="straight" type="button">직선</button>
-            <button class="mode-btn" data-mode="select" type="button">선택</button>
-            <button class="mode-btn" data-mode="station" type="button">역 추가</button>
+            <button class="mode-btn active" data-mode="freehand" type="button" title="자유선"><span class="btn-text">자유선</span><span class="btn-icon">✏️</span></button>
+            <button class="mode-btn" data-mode="straight" type="button" title="직선"><span class="btn-text">직선</span><span class="btn-icon">📏</span></button>
+            <button class="mode-btn" data-mode="select" type="button" title="선택"><span class="btn-text">선택</span><span class="btn-icon">👆</span></button>
+            <button class="mode-btn" data-mode="station" type="button" title="역 추가"><span class="btn-text">역 추가</span><span class="btn-icon">🚉</span></button>
         </div>
 
-        <button id="newMapBtn" type="button">새 노선도</button>
-        <button id="saveMapBtn" type="button">노선도 저장</button>
-        <button id="loadMapBtn" type="button">노선도 불러오기</button>
-        <button id="trainBtn" type="button">시범 운행</button>
-        <button id="deleteBtn" type="button">선택 삭제</button>
+        <button id="newMapBtn" type="button" title="새 노선도"><span class="btn-text">새 노선도</span><span class="btn-icon">📄</span></button>
+        <button id="saveMapBtn" type="button" title="노선도 저장"><span class="btn-text">노선도 저장</span><span class="btn-icon">💾</span></button>
+        <button id="loadMapBtn" type="button" title="노선도 불러오기"><span class="btn-text">노선도 불러오기</span><span class="btn-icon">📂</span></button>
+        <button id="trainBtn" type="button" title="시범 운행"><span class="btn-text">시범 운행</span><span class="btn-icon">🚆</span></button>
+        <button id="deleteBtn" type="button" title="선택 삭제"><span class="btn-text">선택 삭제</span><span class="btn-icon">🗑️</span></button>
+        <button id="legendToggleBtn" class="legend-toggle-btn" type="button" title="호선 안내"><span class="btn-text">호선 안내</span><span class="btn-icon">📋</span></button>
     </div>
 
-    <aside class="legend" id="lineLegend" aria-label="호선 이름 안내"></aside>
+    <aside class="legend mobile-hidden" id="lineLegend" aria-label="호선 이름 안내"></aside>
 
     <canvas id="drawingCanvas" aria-label="지하철 노선도 그리기 캔버스"></canvas>
 

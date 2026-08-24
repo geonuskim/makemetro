@@ -6,8 +6,14 @@ html, body {
     margin: 0;
     width: 100%;
     height: 100%;
-    font-family: Arial, sans-serif;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background: #f4f4f4;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 body {
@@ -19,35 +25,38 @@ body {
 .toolbar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    padding: 12px 16px;
+    padding: 10px 16px;
     background: #ffffff;
     border-bottom: 1px solid #d9d9d9;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     position: relative;
-    z-index: 2;
+    z-index: 10;
 }
 
 .legend {
     position: absolute;
-    top: 14px;
+    top: 60px;
     right: 16px;
     background: rgba(255, 255, 255, 0.96);
     border: 1px solid #d9d9d9;
     border-radius: 12px;
-    padding: 10px 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    padding: 10px 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     font-size: 13px;
     line-height: 1.7;
-    z-index: 3;
+    z-index: 20;
     min-width: 150px;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .legend strong {
     display: block;
     margin-bottom: 4px;
     font-size: 14px;
+    color: #111;
 }
 
 .color-chip {
@@ -62,7 +71,7 @@ body {
 .palette {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
@@ -73,18 +82,20 @@ body {
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    flex-shrink: 0;
+    padding: 0;
 }
 
 .color-btn.active {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 2px #111, 0 0 0 5px rgba(17, 17, 17, 0.1);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px #111, 0 0 0 5px rgba(17, 17, 17, 0.12);
 }
 
 .field {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-size: 14px;
     font-weight: 600;
     color: #333;
@@ -96,12 +107,21 @@ body {
     border-radius: 8px;
     padding: 6px 10px;
     font-size: 14px;
-    width: 90px;
+    width: 85px;
+    background: #fff;
+    color: #222;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: #3b82f6;
 }
 
 .mode-group {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .mode-btn,
@@ -109,14 +129,41 @@ body {
 #saveMapBtn,
 #loadMapBtn,
 #deleteBtn,
-#trainBtn {
+#trainBtn,
+#legendToggleBtn {
     border: none;
     border-radius: 8px;
     padding: 8px 12px;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     background: #ececec;
     color: #222;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mode-btn:active,
+#newMapBtn:active,
+#saveMapBtn:active,
+#loadMapBtn:active,
+#deleteBtn:active,
+#trainBtn:active,
+#legendToggleBtn:active {
+    transform: scale(0.96);
+}
+
+.btn-icon {
+    display: none;
+}
+
+.btn-text {
+    display: inline;
 }
 
 .mode-btn.active,
@@ -141,35 +188,134 @@ body {
 }
 
 #deleteBtn {
-    background: #c62828;
+    background: #dc2626;
     color: #fff;
 }
 
 #trainBtn {
-    background: #0f766e;
+    background: #059669;
     color: #fff;
+}
+
+#trainBtn.active {
+    background: #e11d48;
+}
+
+#legendToggleBtn {
+    background: #e2e8f0;
+    color: #334155;
 }
 
 #drawingCanvas {
     flex: 1;
     width: 100%;
-    height: calc(100vh - 70px);
+    height: 100%;
     display: block;
     background: #ffffff;
     cursor: crosshair;
+    touch-action: none;
 }
 
-@media (max-width: 700px) {
+/* 모바일 반응형: 위쪽 한 줄 배치 & 정사각형 버튼 */
+@media (max-width: 768px) {
     .toolbar {
-        padding: 10px 12px;
+        padding: 6px 10px;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        height: 52px;
+        min-height: 52px;
+        max-height: 52px;
+    }
+
+    .toolbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .palette {
+        gap: 4px;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+    }
+
+    .color-btn {
+        width: 24px;
+        height: 24px;
+        border-width: 2px;
     }
 
     .field {
-        width: 100%;
-        justify-content: space-between;
+        flex-shrink: 0;
+        gap: 2px;
     }
 
-    .field input {
-        flex: 1;
+    .field label {
+        display: none;
+    }
+
+    .field input,
+    .field select {
+        height: 36px;
+        padding: 4px 6px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+
+    .field #lineNameInput {
+        width: 62px;
+    }
+
+    .field #stationNameInput {
+        width: 62px;
+    }
+
+    .field #saveSlotSelect {
+        width: 52px;
+    }
+
+    .mode-group {
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+    .mode-btn,
+    #newMapBtn,
+    #saveMapBtn,
+    #loadMapBtn,
+    #deleteBtn,
+    #trainBtn,
+    #legendToggleBtn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        padding: 0;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-icon {
+        display: inline-flex;
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .legend {
+        top: 56px;
+        right: 8px;
+        max-width: 200px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .legend.mobile-hidden {
+        display: none;
     }
 }
