@@ -39,23 +39,63 @@ body {
     position: absolute;
     top: 60px;
     right: 16px;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid #d9d9d9;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #d0d0d0;
     border-radius: 12px;
-    padding: 10px 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 12px 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
     font-size: 13px;
     line-height: 1.7;
-    z-index: 20;
-    min-width: 150px;
-    backdrop-filter: blur(4px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 50;
+    min-width: 160px;
+    backdrop-filter: blur(8px);
+    display: none;
 }
 
-.legend strong {
+.legend.open {
     display: block;
-    margin-bottom: 4px;
+    animation: fadeInScale 0.15s ease forwards;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.legend-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #eee;
+}
+
+.legend-header strong {
     font-size: 14px;
+    color: #111;
+}
+
+.legend-close-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #666;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+}
+
+.legend-close-btn:hover {
+    background: #eee;
     color: #111;
 }
 
@@ -142,7 +182,6 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
     transition: background-color 0.15s ease, transform 0.1s ease;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -158,16 +197,17 @@ body {
     transform: scale(0.96);
 }
 
-.btn-icon {
-    display: none;
-}
-
-.btn-text {
+.desktop-text {
     display: inline;
 }
 
+.mobile-text {
+    display: none;
+}
+
 .mode-btn.active,
-#trainBtn.active {
+#trainBtn.active,
+#legendToggleBtn.active {
     background: #222;
     color: #fff;
 }
@@ -202,8 +242,13 @@ body {
 }
 
 #legendToggleBtn {
-    background: #e2e8f0;
-    color: #334155;
+    background: #475569;
+    color: #fff;
+}
+
+#legendToggleBtn.active {
+    background: #0f172a;
+    box-shadow: inset 0 0 0 2px #fff;
 }
 
 #drawingCanvas {
@@ -216,19 +261,19 @@ body {
     touch-action: none;
 }
 
-/* 모바일 반응형: 위쪽 한 줄 배치 & 정사각형 버튼 */
+/* 모바일 반응형: 위쪽 한 줄 배치 & 초소형 정사각형 글씨 버튼 */
 @media (max-width: 768px) {
     .toolbar {
-        padding: 6px 10px;
-        gap: 6px;
+        padding: 4px 6px;
+        gap: 4px;
         flex-wrap: nowrap;
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        height: 52px;
-        min-height: 52px;
-        max-height: 52px;
+        height: 44px;
+        min-height: 44px;
+        max-height: 44px;
     }
 
     .toolbar::-webkit-scrollbar {
@@ -236,14 +281,16 @@ body {
     }
 
     .palette {
-        gap: 4px;
+        gap: 3px;
         flex-wrap: nowrap;
         flex-shrink: 0;
     }
 
     .color-btn {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
         border-width: 2px;
     }
 
@@ -258,26 +305,26 @@ body {
 
     .field input,
     .field select {
-        height: 36px;
-        padding: 4px 6px;
-        font-size: 13px;
-        border-radius: 8px;
+        height: 32px;
+        padding: 2px 4px;
+        font-size: 11px;
+        border-radius: 6px;
     }
 
     .field #lineNameInput {
-        width: 62px;
+        width: 48px;
     }
 
     .field #stationNameInput {
-        width: 62px;
+        width: 48px;
     }
 
     .field #saveSlotSelect {
-        width: 52px;
+        width: 42px;
     }
 
     .mode-group {
-        gap: 4px;
+        gap: 3px;
         flex-shrink: 0;
     }
 
@@ -288,34 +335,35 @@ body {
     #deleteBtn,
     #trainBtn,
     #legendToggleBtn {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        min-height: 36px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        max-width: 32px;
+        max-height: 32px;
         padding: 0;
-        border-radius: 8px;
+        border-radius: 6px;
         flex-shrink: 0;
     }
 
-    .btn-text {
+    .desktop-text {
         display: none;
     }
 
-    .btn-icon {
-        display: inline-flex;
-        font-size: 16px;
+    .mobile-text {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
         line-height: 1;
+        letter-spacing: -0.5px;
     }
 
     .legend {
-        top: 56px;
-        right: 8px;
+        top: 48px;
+        right: 6px;
         max-width: 200px;
-        max-height: 60vh;
+        max-height: 70vh;
         overflow-y: auto;
-    }
-
-    .legend.mobile-hidden {
-        display: none;
+        padding: 10px 12px;
     }
 }

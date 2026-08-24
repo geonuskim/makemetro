@@ -46,7 +46,22 @@ function updateLegend() {
         const name = state.lineNames[color.hex] || color.defaultLine;
         return `<div><span class="color-chip" style="background:${color.hex}"></span>${color.label}: ${name}</div>`;
     }).join('');
-    lineLegend.innerHTML = `<strong>호선 이름</strong>${items}`;
+    lineLegend.innerHTML = `
+        <div class="legend-header">
+            <strong>호선 안내</strong>
+            <button type="button" class="legend-close-btn" id="legendCloseBtn" aria-label="닫기">✕</button>
+        </div>
+        ${items}
+    `;
+    const closeBtn = document.getElementById('legendCloseBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            lineLegend.classList.remove('open');
+            if (legendToggleBtn) {
+                legendToggleBtn.classList.remove('active');
+            }
+        });
+    }
 }
 
 function setActiveColor(colorHex) {
@@ -191,10 +206,10 @@ function drawPath(points, color, width = 5, dashed = false) {
 }
 
 function setTrainBtnState(running) {
-    const textSpan = trainBtn.querySelector('.btn-text');
-    const iconSpan = trainBtn.querySelector('.btn-icon');
-    if (textSpan) textSpan.textContent = running ? '운행 중지' : '시범 운행';
-    if (iconSpan) iconSpan.textContent = running ? '⏹️' : '🚆';
+    const desktopText = trainBtn.querySelector('.desktop-text');
+    const mobileText = trainBtn.querySelector('.mobile-text');
+    if (desktopText) desktopText.textContent = running ? '시범 운행 중지' : '시범 운행';
+    if (mobileText) mobileText.textContent = running ? '중지' : '운행';
     trainBtn.classList.toggle('active', running);
 }
 
@@ -719,7 +734,8 @@ loadMapBtn.addEventListener('click', loadMap);
 
 if (legendToggleBtn) {
     legendToggleBtn.addEventListener('click', () => {
-        lineLegend.classList.toggle('mobile-hidden');
+        const isOpen = lineLegend.classList.toggle('open');
+        legendToggleBtn.classList.toggle('active', isOpen);
     });
 }
 

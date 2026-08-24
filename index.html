@@ -12,12 +12,12 @@
 
         <div class="field">
             <label for="lineNameInput">호선</label>
-            <input id="lineNameInput" type="text" value="1호선" maxlength="12" placeholder="호선명" title="호선 이름">
+            <input id="lineNameInput" type="text" value="1호선" maxlength="12" placeholder="호선" title="호선 이름">
         </div>
 
         <div class="field">
             <label for="stationNameInput">역</label>
-            <input id="stationNameInput" type="text" value="역" maxlength="12" placeholder="역이름" title="역 이름">
+            <input id="stationNameInput" type="text" value="역" maxlength="12" placeholder="역" title="역 이름">
         </div>
 
         <div class="field">
@@ -32,21 +32,21 @@
         </div>
 
         <div class="mode-group">
-            <button class="mode-btn active" data-mode="freehand" type="button" title="자유선"><span class="btn-text">자유선</span><span class="btn-icon">✏️</span></button>
-            <button class="mode-btn" data-mode="straight" type="button" title="직선"><span class="btn-text">직선</span><span class="btn-icon">📏</span></button>
-            <button class="mode-btn" data-mode="select" type="button" title="선택"><span class="btn-text">선택</span><span class="btn-icon">👆</span></button>
-            <button class="mode-btn" data-mode="station" type="button" title="역 추가"><span class="btn-text">역 추가</span><span class="btn-icon">🚉</span></button>
+            <button class="mode-btn active" data-mode="freehand" type="button" title="자유선"><span class="desktop-text">자유선</span><span class="mobile-text">자유</span></button>
+            <button class="mode-btn" data-mode="straight" type="button" title="직선"><span class="desktop-text">직선</span><span class="mobile-text">직선</span></button>
+            <button class="mode-btn" data-mode="select" type="button" title="선택"><span class="desktop-text">선택</span><span class="mobile-text">선택</span></button>
+            <button class="mode-btn" data-mode="station" type="button" title="역 추가"><span class="desktop-text">역 추가</span><span class="mobile-text">역+</span></button>
         </div>
 
-        <button id="newMapBtn" type="button" title="새 노선도"><span class="btn-text">새 노선도</span><span class="btn-icon">📄</span></button>
-        <button id="saveMapBtn" type="button" title="노선도 저장"><span class="btn-text">노선도 저장</span><span class="btn-icon">💾</span></button>
-        <button id="loadMapBtn" type="button" title="노선도 불러오기"><span class="btn-text">노선도 불러오기</span><span class="btn-icon">📂</span></button>
-        <button id="trainBtn" type="button" title="시범 운행"><span class="btn-text">시범 운행</span><span class="btn-icon">🚆</span></button>
-        <button id="deleteBtn" type="button" title="선택 삭제"><span class="btn-text">선택 삭제</span><span class="btn-icon">🗑️</span></button>
-        <button id="legendToggleBtn" class="legend-toggle-btn" type="button" title="호선 안내"><span class="btn-text">호선 안내</span><span class="btn-icon">📋</span></button>
+        <button id="newMapBtn" type="button" title="새 노선도"><span class="desktop-text">새 노선도</span><span class="mobile-text">새로</span></button>
+        <button id="saveMapBtn" type="button" title="노선도 저장"><span class="desktop-text">노선도 저장</span><span class="mobile-text">저장</span></button>
+        <button id="loadMapBtn" type="button" title="노선도 불러오기"><span class="desktop-text">노선도 불러오기</span><span class="mobile-text">불러</span></button>
+        <button id="trainBtn" type="button" title="시범 운행"><span class="desktop-text">시범 운행</span><span class="mobile-text">운행</span></button>
+        <button id="deleteBtn" type="button" title="선택 삭제"><span class="desktop-text">선택 삭제</span><span class="mobile-text">삭제</span></button>
+        <button id="legendToggleBtn" class="legend-toggle-btn" type="button" title="호선 안내"><span class="desktop-text">호선 안내</span><span class="mobile-text">안내</span></button>
     </div>
 
-    <aside class="legend mobile-hidden" id="lineLegend" aria-label="호선 이름 안내"></aside>
+    <aside class="legend" id="lineLegend" aria-label="호선 이름 안내"></aside>
 
     <canvas id="drawingCanvas" aria-label="지하철 노선도 그리기 캔버스"></canvas>
 
