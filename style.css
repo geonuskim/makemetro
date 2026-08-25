@@ -37,8 +37,9 @@ body {
 
 .legend {
     position: absolute;
-    top: 60px;
+    bottom: 20px;
     right: 16px;
+    top: auto;
     background: rgba(255, 255, 255, 0.98);
     border: 1px solid #d0d0d0;
     border-radius: 12px;
@@ -261,8 +262,7 @@ body {
     touch-action: none;
 }
 
-/* 모바일 반응형: body.is-mobile 클래스 또는 화면 해상도(세로/가로 모드)에 대응 */
-body.is-mobile .toolbar,
+/* 미디어 쿼리: 좁은 너비(세로 모드) 또는 낮은 높이(가로 모드) */
 @media (max-width: 768px), (max-height: 520px) {
     .toolbar {
         padding: 4px 6px;
@@ -360,7 +360,8 @@ body.is-mobile .toolbar,
     }
 
     .legend {
-        top: 46px;
+        top: auto;
+        bottom: 16px;
         right: 6px;
         max-width: 200px;
         max-height: calc(100vh - 55px);
@@ -369,18 +370,21 @@ body.is-mobile .toolbar,
     }
 }
 
-/* body.is-mobile 상태 전용 강제 스타일 */
+/* body.is-mobile: UA 감지 기반 강제 모바일 스타일 */
 body.is-mobile .toolbar {
-    padding: 4px 6px;
-    gap: 4px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
+    padding: 4px 6px !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
     scrollbar-width: none;
-    height: 42px;
-    min-height: 42px;
-    max-height: 42px;
+}
+
+body.is-mobile .toolbar::-webkit-scrollbar {
+    display: none;
 }
 
 body.is-mobile .desktop-text {
@@ -389,10 +393,10 @@ body.is-mobile .desktop-text {
 
 body.is-mobile .mobile-text {
     display: inline-block !important;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.5px;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.5px !important;
 }
 
 body.is-mobile .mode-btn,
@@ -409,8 +413,14 @@ body.is-mobile #legendToggleBtn {
     max-width: 32px !important;
     max-height: 32px !important;
     padding: 0 !important;
-    border-radius: 6px;
-    flex-shrink: 0;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+}
+
+body.is-mobile .palette {
+    gap: 3px !important;
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
 body.is-mobile .color-btn {
@@ -418,6 +428,12 @@ body.is-mobile .color-btn {
     height: 20px !important;
     min-width: 20px !important;
     min-height: 20px !important;
+    border-width: 2px !important;
+}
+
+body.is-mobile .field {
+    flex-shrink: 0 !important;
+    gap: 2px !important;
 }
 
 body.is-mobile .field label {
@@ -429,7 +445,7 @@ body.is-mobile .field select {
     height: 32px !important;
     padding: 2px 4px !important;
     font-size: 11px !important;
-    border-radius: 6px;
+    border-radius: 6px !important;
 }
 
 body.is-mobile .field #lineNameInput {
@@ -444,9 +460,15 @@ body.is-mobile .field #saveSlotSelect {
     width: 42px !important;
 }
 
+body.is-mobile .mode-group {
+    gap: 3px !important;
+    flex-shrink: 0 !important;
+}
+
 body.is-mobile .legend {
-    top: 46px;
-    right: 6px;
+    top: auto !important;
+    bottom: 16px !important;
+    right: 6px !important;
     max-width: 200px;
     max-height: calc(100vh - 55px);
     overflow-y: auto;
