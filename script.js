@@ -763,8 +763,54 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-window.addEventListener('resize', resizeCanvas);
+function checkMobileDevice() {
+    let isMobile = false;
+    try {
+        if (typeof UAParser !== 'undefined') {
+            const parser = new UAParser();
+            const result = parser.getResult();
+            const deviceType = result.device && result.device.type;
+            const osName = (result.os && result.os.name) || '';
+            if (deviceType === 'mobile' || deviceType === 'tablet' || /Android|iOS|Windows Phone|BlackBerry/i.test(osName)) {
+                isMobile = true;
+            }
+        }
+    } catch (e) {
+        console.warn('UAParser detection error, using fallback', e);
+    }
+
+    if (!isMobile) {
+        const ua = navigator.userAgent || '';
+        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+        const isIPadOS = navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua);
+        if (isMobileUA || isIPadOS) {
+            isMobile = true;
+        }
+    }
+
+    const isMobileViewport = window.innerWidth <= 768 || (window.innerHeight <= 520 && window.innerWidth <= 1024);
+
+    if (isMobile || isMobileViewport) {
+        document.body.classList.add('is-mobile');
+    } else {
+        document.body.classList.remove('is-mobile');
+    }
+
+    return isMobile;
+}
+
+function handleViewportChange() {
+    checkMobileDevice();
+    resizeCanvas();
+}
+
+window.addEventListener('resize', handleViewportChange);
+window.addEventListener('orientationchange', () => {
+    setTimeout(handleViewportChange, 150);
+});
+
 window.__metroState = state;
+checkMobileDevice();
 setActiveColor(state.activeColor);
 updateLegend();
 resizeCanvas();
