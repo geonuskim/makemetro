@@ -168,143 +168,23 @@ function findLineAtPoint(x, y) {
 function findStationAtPoint(x, y) {
     for (let i = state.stations.length - 1; i >= 0; i -= 1) {
         const station = state.stations[i];
-        if (Math.hypot(x - station.x, y - station.y) <= 14) {
+        if (Math.hypot(x - station.x, y - station.y) <= 12) {
             return station.id;
         }
     }
     return null;
 }
 
-function findEndpointNear(x, y, color, threshold = 18) {
+function findContinuationStart(x, y, color) {
     const sameColorLines = state.lines.filter((line) => line.color === color);
     for (let i = sameColorLines.length - 1; i >= 0; i -= 1) {
         const line = sameColorLines[i];
-        if (!line.points || line.points.length === 0) continue;
-        const startPoint = line.points[0];
-        const endPoint = line.points[line.points.length - 1];
-
-        if (Math.hypot(x - endPoint.x, y - endPoint.y) <= threshold) {
-            return { line, endpoint: 'end', point: { x: endPoint.x, y: endPoint.y } };
-        }
-        if (Math.hypot(x - startPoint.x, y - startPoint.y) <= threshold) {
-            return { line, endpoint: 'start', point: { x: startPoint.x, y: startPoint.y } };
+        const lastPoint = line.points[line.points.length - 1];
+        if (Math.hypot(x - lastPoint.x, y - lastPoint.y) <= 18) {
+            return line;
         }
     }
     return null;
-}
-
-function getStationColors(station) {
-    const colors = [];
-    const stationPos = { x: station.x, y: station.y };
-
-    state.lines.forEach((line) => {
-        if (stationNearPolyline(stationPos, line.points, 12)) {
-            if (!colors.includes(line.color)) {
-                colors.push(line.color);
-            }
-        }
-    });
-
-    if (colors.length === 0) {
-        colors.push(station.color || state.activeColor);
-    }
-    return colors;
-}
-
-function drawStation(station, selected) {
-    const colors = getStationColors(station);
-    const isTransfer = colors.length >= 2;
-    const radius = isTransfer ? (selected ? 10 : 8) : (selected ? 8 : 6);
-
-    ctx.save();
-
-    if (colors.length === 1) {
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = colors[0];
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius, 0, Math.PI * 2);
-        ctx.lineWidth = selected ? 2.5 : 1.5;
-        ctx.strokeStyle = selected ? '#111827' : '#ffffff';
-        ctx.stroke();
-    } else if (colors.length === 2) {
-        // 2개 호선 환승역: 세로 2등분 (왼쪽/오른쪽 반원)
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius, Math.PI * 0.5, Math.PI * 1.5);
-        ctx.closePath();
-        ctx.fillStyle = colors[0];
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius, Math.PI * 1.5, Math.PI * 2.5);
-        ctx.closePath();
-        ctx.fillStyle = colors[1];
-        ctx.fill();
-
-        // 중앙 분할선
-        ctx.beginPath();
-        ctx.moveTo(station.x, station.y - radius);
-        ctx.lineTo(station.x, station.y + radius);
-        ctx.lineWidth = 1.5;
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
-
-        // 외곽 원 테두리
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius, 0, Math.PI * 2);
-        ctx.lineWidth = selected ? 2.5 : 1.5;
-        ctx.strokeStyle = selected ? '#111827' : '#ffffff';
-        ctx.stroke();
-    } else {
-        // 3개 이상 호선: N등분 피자 조각 (파이 차트)
-        const N = colors.length;
-        const sliceAngle = (Math.PI * 2) / N;
-        const startAngle = -Math.PI / 2;
-
-        for (let i = 0; i < N; i += 1) {
-            const a1 = startAngle + i * sliceAngle;
-            const a2 = a1 + sliceAngle;
-            ctx.beginPath();
-            ctx.moveTo(station.x, station.y);
-            ctx.arc(station.x, station.y, radius, a1, a2);
-            ctx.closePath();
-            ctx.fillStyle = colors[i];
-            ctx.fill();
-
-            // 분할선
-            ctx.beginPath();
-            ctx.moveTo(station.x, station.y);
-            ctx.lineTo(station.x + Math.cos(a1) * radius, station.y + Math.sin(a1) * radius);
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = '#ffffff';
-            ctx.stroke();
-        }
-
-        // 외곽 원 테두리
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius, 0, Math.PI * 2);
-        ctx.lineWidth = selected ? 2.5 : 1.5;
-        ctx.strokeStyle = selected ? '#111827' : '#ffffff';
-        ctx.stroke();
-    }
-
-    if (selected) {
-        ctx.beginPath();
-        ctx.arc(station.x, station.y, radius + 3, 0, Math.PI * 2);
-        ctx.lineWidth = 1.5;
-        ctx.strokeStyle = 'rgba(17, 24, 39, 0.6)';
-        ctx.stroke();
-    }
-
-    // 역 이름 텍스트
-    ctx.beginPath();
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    ctx.fillText(station.name, station.x + radius + 3, station.y - radius + 3);
-
-    ctx.restore();
 }
 
 function drawPath(points, color, width = 5, dashed = false) {
@@ -403,7 +283,80 @@ function loadMap() {
     }
 }
 
+function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    state.lines.forEach((line) => {
+        drawPath(line.points, line.color, 5, false);
+        if (state.selectedLineId === line.id) {
+            drawPath(line.points, 'rgba(0, 0, 0, 0.45)', 11, true);
+        }
+    });
+
+    if (state.currentDraft) {
+        drawPath(state.currentDraft.points, state.currentDraft.color, 5, false);
+    }
+
+    state.stations.forEach((station) => {
+        const selected = station.id === state.selectedStationId;
+        ctx.beginPath();
+        ctx.fillStyle = station.transfer ? '#ffffff' : station.color;
+        ctx.arc(station.x, station.y, selected ? 8 : 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (station.transfer) {
+            ctx.beginPath();
+            ctx.strokeStyle = station.color;
+            ctx.lineWidth = 2;
+            ctx.arc(station.x, station.y, selected ? 10 : 8, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.fillStyle = '#111';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(station.name, station.x + 10, station.y - 10);
+    });
+
+    if (state.trainRunning) {
+        drawTrainMarker();
+    }
+}
+
+function finalizeDraft(event) {
+    if (event && event.pointerId && canvas.hasPointerCapture && canvas.hasPointerCapture(event.pointerId)) {
+        try {
+            canvas.releasePointerCapture(event.pointerId);
+        } catch (e) {}
+    }
+
+    if (!state.currentDraft || state.currentDraft.points.length < 2) {
+        state.currentDraft = null;
+        render();
+        return;
+    }
+
+    const draft = state.currentDraft;
+    const existingLine = state.lines.find((line) => line.color === draft.color);
+
+    if (draft.continueLineId) {
+        const target = state.lines.find((line) => line.id === draft.continueLineId);
+        if (target) {
+            target.points = target.points.concat(draft.points.slice(1).map((point) => ({ ...point })));
+        }
+    } else if (existingLine) {
+        existingLine.points = existingLine.points.concat(draft.points.slice(1).map((point) => ({ ...point })));
+    } else {
+        state.lines.push({
+            id: Date.now() + Math.random(),
+            color: draft.color,
+            points: draft.points.map((point) => ({ ...point }))
+        });
+    }
+
+    state.currentDraft = null;
+    render();
+}
 
 function stationNearPolyline(point, points, threshold = 10) {
     for (let i = 0; i < points.length - 1; i += 1) {
@@ -524,13 +477,14 @@ function handlePointerDown(event) {
     const point = getPointerPosition(event);
 
     if (state.mode === 'freehand' || state.mode === 'straight') {
-        const continuation = findEndpointNear(point.x, point.y, state.activeColor);
-        const startPoint = continuation ? continuation.point : point;
+        const continuation = findContinuationStart(point.x, point.y, state.activeColor);
         state.currentDraft = {
             color: state.activeColor,
             mode: state.mode,
-            continueInfo: continuation ? { lineId: continuation.line.id, endpoint: continuation.endpoint } : null,
-            points: [startPoint]
+            continueLineId: continuation ? continuation.id : null,
+            points: continuation
+                ? [{ x: continuation.points[continuation.points.length - 1].x, y: continuation.points[continuation.points.length - 1].y }, point]
+                : [point]
         };
         state.selectedLineId = null;
         state.selectedStationId = null;
